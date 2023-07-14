@@ -1,31 +1,27 @@
 ---
-author: David Schoch 
-categories:
-- network analysis
-description: Tutorial for Network Analysis in R
 title: "Basic Network Analysis in R"
 subtitle: "using igraph and related packages"
-priority: 2
-image: featured.png
+author: 
+  - name: David Schoch
+    orcid: 0000-0003-1689-0557
+    email: david.schoch@gesis.org
+    url: https://mr.schochastics.net
+    affiliations:
+      - name: GESIS - Leibniz Institute for the Social Sciences
+description: Tutorial for Network Analysis in R
 toc: true
-title-block-style: none
-comments:
-  utterances:
-    repo: schochastics/quarto-schochastics
-    issue-term: pathname
-    label: comment
-    theme: photon-dark
+title-block-style: default
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE,
-                      message = FALSE,
-                      warning = FALSE,
-                      cache = TRUE,
-                      out.width = "100%")
+knitr::opts_chunk$set(
+    echo = TRUE,
+    message = FALSE,
+    warning = FALSE,
+    cache = TRUE,
+    out.width = "100%"
+)
 ```
-
-(last update `r Sys.Date()`)
 
 # Introduction
 
@@ -42,7 +38,7 @@ relevant literature (a list is given at the end of the tutorial).
 
 To run all the code in this tutorial, you need to install and load three packages.
 ```{r install_libraries,eval=FALSE}
-install.packages(c("igraph","netrankr"))
+install.packages(c("igraph", "netrankr"))
 devtools::install_github("schochastics/networkdata")
 ```
 
@@ -84,17 +80,21 @@ Exponential Random Graph Models (ERGMs) and Stochastic Actor Oriented Models (SA
 The figure below shows how many packages on CRAN rely on those three packages (i.e. they are mentioned in `Depends`, `Imports`, or `Suggests`).
 ```{r crannet_depend, echo=FALSE}
 sg <- readRDS("crannet.RDS")
-ggraph(sg,"stress")+
-  geom_edge_link0(edge_color="grey66", edge_width=0.3,
-                  arrow = arrow(angle = 15, length = unit(0.15, "inches"),
-                                ends = "last", type = "closed"))+
-  geom_node_point(shape=21,aes(fill=col,size=seed))+
-  scale_fill_brewer(type="qual",name="")+
-  scale_size_manual(values = c(2,5),guide="none")+
-  guides(fill = guide_legend(override.aes = list(size=5)))+
-  theme_void()+
-  theme(legend.position = "bottom")+
-  coord_equal(clip="off")
+ggraph(sg, "stress") +
+    geom_edge_link0(
+        edge_color = "grey66", edge_width = 0.3,
+        arrow = arrow(
+            angle = 15, length = unit(0.15, "inches"),
+            ends = "last", type = "closed"
+        )
+    ) +
+    geom_node_point(shape = 21, aes(fill = col, size = seed)) +
+    scale_fill_brewer(type = "qual", name = "") +
+    scale_size_manual(values = c(2, 5), guide = "none") +
+    guides(fill = guide_legend(override.aes = list(size = 5))) +
+    theme_void() +
+    theme(legend.position = "bottom") +
+    coord_equal(clip = "off")
 ```
 
 The figure was produced with the help of the `cranet` package ([link](https://github.com/mbojan/cranet)).
@@ -152,12 +152,12 @@ data("greys")
 ```
 
 ```{r plot_greys,echo=FALSE,fig.width=12,fig.height=8}
-ggraph(greys,"stress",bbox=10) + 
-  geom_edge_link0(edge_color="grey66")+
-  geom_node_point(shape=21,aes(fill=sex),size=5,show.legend = FALSE)+
-  geom_node_text(aes(label=name),repel = TRUE)+
-  scale_fill_manual(values=c("grey66","#E8813A","#4D189D"))+
-  theme_void()
+ggraph(greys, "stress", bbox = 10) +
+    geom_edge_link0(edge_color = "grey66") +
+    geom_node_point(shape = 21, aes(fill = sex), size = 5, show.legend = FALSE) +
+    geom_node_text(aes(label = name), repel = TRUE) +
+    scale_fill_manual(values = c("grey66", "#E8813A", "#4D189D")) +
+    theme_void()
 ```
 
 The "greys" network is part of the `networkdata` package and consists of most characters from the 
@@ -174,9 +174,11 @@ greys
 
 The **density** of a network is defined as the fraction of the potential edges in a network that are actually present.
 ```{r density}
-c(graph.density(graph.empty(10)),
-  graph.density(greys),
-  graph.density(graph.full(10)))
+c(
+    graph.density(graph.empty(10)),
+    graph.density(greys),
+    graph.density(graph.full(10))
+)
 ```
 
 The density of an empty network is $0$ and for the full network it is $1$. The density of empirical network 
@@ -185,27 +187,26 @@ becomes quite sparse.
 
 A **shortest path** is a path that connects two nodes in a network with a minimal number of edges. The length of a shortest path is called the **distance** between two nodes.
 ```{r shortest_path}
-shortest_paths(greys,from = "Alex Karev",to = "Owen Hunt",output = "vpath")
+shortest_paths(greys, from = "Alex Karev", to = "Owen Hunt", output = "vpath")
 ```
 
 ```{r greys_shortest_path, echo=FALSE,fig.width=12,fig.height=8}
-
 E(greys)$epath <- FALSE
-E(greys)$epath[as.integer(shortest_paths(greys,from = "Alex Karev",to = "Owen Hunt",output = "epath")$epath[[1]])] <- TRUE
+E(greys)$epath[as.integer(shortest_paths(greys, from = "Alex Karev", to = "Owen Hunt", output = "epath")$epath[[1]])] <- TRUE
 
-ggraph(greys,"stress",bbox=10) + 
-  geom_edge_link0(aes(color=epath,width=epath),show.legend = FALSE)+
-  geom_node_point(shape=21,aes(fill=sex),size=5,show.legend = FALSE)+
-  geom_node_text(aes(label=name),repel = TRUE)+
-  scale_fill_manual(values=c("grey66","#E8813A","#4D189D"))+
-  scale_edge_color_manual(values=c("grey66","firebrick3"))+
-  scale_edge_width_manual(values=c(0.5,1.5))+
-  theme_void()
+ggraph(greys, "stress", bbox = 10) +
+    geom_edge_link0(aes(color = epath, width = epath), show.legend = FALSE) +
+    geom_node_point(shape = 21, aes(fill = sex), size = 5, show.legend = FALSE) +
+    geom_node_text(aes(label = name), repel = TRUE) +
+    scale_fill_manual(values = c("grey66", "#E8813A", "#4D189D")) +
+    scale_edge_color_manual(values = c("grey66", "firebrick3")) +
+    scale_edge_width_manual(values = c(0.5, 1.5)) +
+    theme_void()
 
 ```
 
 ```{r distances}
-distances(greys)[1:10,1:10]
+distances(greys)[1:10, 1:10]
 ```
 
 The Grey's Anatomy network is **disconnected** and consists of $4$ **connected components**. There are no 
@@ -217,18 +218,17 @@ diameter(greys)
 ```
 
 ```{r greys_diameter, echo=FALSE,fig.width=12,fig.height=8}
-
 E(greys)$epath <- FALSE
-E(greys)$epath[as.integer(shortest_paths(greys,from = "Finn Dandridge",to = "Colin Marlow",output = "epath")$epath[[1]])] <- TRUE
+E(greys)$epath[as.integer(shortest_paths(greys, from = "Finn Dandridge", to = "Colin Marlow", output = "epath")$epath[[1]])] <- TRUE
 
-ggraph(greys,"stress",bbox=10) + 
-  geom_edge_link0(aes(color=epath,width=epath),show.legend = FALSE)+
-  geom_node_point(shape=21,aes(fill=sex),size=5,show.legend = FALSE)+
-  geom_node_text(aes(label=name),repel = TRUE)+
-  scale_fill_manual(values=c("grey66","#E8813A","#4D189D"))+
-  scale_edge_color_manual(values=c("grey66","firebrick3"))+
-  scale_edge_width_manual(values=c(0.5,1.5))+
-  theme_void()
+ggraph(greys, "stress", bbox = 10) +
+    geom_edge_link0(aes(color = epath, width = epath), show.legend = FALSE) +
+    geom_node_point(shape = 21, aes(fill = sex), size = 5, show.legend = FALSE) +
+    geom_node_text(aes(label = name), repel = TRUE) +
+    scale_fill_manual(values = c("grey66", "#E8813A", "#4D189D")) +
+    scale_edge_color_manual(values = c("grey66", "firebrick3")) +
+    scale_edge_width_manual(values = c(0.5, 1.5)) +
+    theme_void()
 
 ```
 
@@ -254,22 +254,26 @@ About `r round(reciprocity(rhesus)*100)`% of edges are reciprocated in the netwo
 
 ```{r rhesus_net,echo=FALSE}
 E(rhesus)$mutual <- is.mutual(rhesus)
-#plot
-ggraph(rhesus,"stress")+
-  geom_edge_parallel( aes(filter =! mutual), edge_color="grey66", edge_width=0.5,
-    arrow = arrow(angle = 15, length = unit(0.15, "inches"),
-                  ends = "last", type = "closed"),n=2,end_cap = circle(8,"pt")
-    
-  )+
-  geom_edge_parallel( aes(filter=mutual), edge_color="black", edge_width=0.5,
-                      arrow = arrow(angle = 15, length = unit(0.15, "inches"),
-                                    ends = "last", type = "closed"),n=2,end_cap = circle(8,"pt")
-                      
-  )+
-  geom_node_point(shape=21,size=8,aes(fill=gender))+
-  scale_fill_manual(values=c("#E8813A","#4D189D"),name="")+
-  theme_void()+
-  theme(legend.position = "bottom")
+# plot
+ggraph(rhesus, "stress") +
+    geom_edge_parallel(aes(filter = !mutual),
+        edge_color = "grey66", edge_width = 0.5,
+        arrow = arrow(
+            angle = 15, length = unit(0.15, "inches"),
+            ends = "last", type = "closed"
+        ), n = 2, end_cap = circle(8, "pt")
+    ) +
+    geom_edge_parallel(aes(filter = mutual),
+        edge_color = "black", edge_width = 0.5,
+        arrow = arrow(
+            angle = 15, length = unit(0.15, "inches"),
+            ends = "last", type = "closed"
+        ), n = 2, end_cap = circle(8, "pt")
+    ) +
+    geom_node_point(shape = 21, size = 8, aes(fill = gender)) +
+    scale_fill_manual(values = c("#E8813A", "#4D189D"), name = "") +
+    theme_void() +
+    theme(legend.position = "bottom")
 
 ```
 
@@ -305,19 +309,23 @@ The function returns the triad census for each network as a list, which we turn 
 in the second step. Afterwards, we manually add the row and column names of the matrix.
 
 ```{r football_census}
-footy_census <- lapply(football_triad,triad_census) 
-footy_census <- matrix(unlist(footy_census),ncol=16,byrow = T)
-rownames(footy_census) <- sapply(football_triad,function(x) x$name)
-colnames(footy_census) <- c("003","012","102","021D","021U","021C","111D","111U",
-                         "030T","030C","201","120D","120U","120C","210","300")
+footy_census <- lapply(football_triad, triad_census)
+footy_census <- matrix(unlist(footy_census), ncol = 16, byrow = T)
+rownames(footy_census) <- sapply(football_triad, function(x) x$name)
+colnames(footy_census) <- c(
+    "003", "012", "102", "021D", "021U", "021C", "111D", "111U",
+    "030T", "030C", "201", "120D", "120U", "120C", "210", "300"
+)
 
-#normalize to make proportions comparable across leagues
-footy_census_norm <- footy_census/rowSums(footy_census)
+# normalize to make proportions comparable across leagues
+footy_census_norm <- footy_census / rowSums(footy_census)
 
-#check the Top 5 leagues
-idx <- which(rownames(footy_census)%in%c("england","spain","germany",
-                                      "italy","france"))
-footy_census[idx,]
+# check the Top 5 leagues
+idx <- which(rownames(footy_census) %in% c(
+    "england", "spain", "germany",
+    "italy", "france"
+))
+footy_census[idx, ]
 ```
 
 Notice how the transitive triad (030T) has the largest count in the top leagues, hinting toward the childhood wisdom:
@@ -333,16 +341,20 @@ SVDs are used to reduce the dimensionality of the data, but retaining most of th
 data is 16 dimensional, which is impossible to visualize to compare the networks. With an SVD, we can reduce it to two dimensions and get a better visual overview.
 
 ```{r plot_svd_u,echo = FALSE,fig.width=12,fig.height=6}
-data.frame(u1 = footy_svd$d[1]*footy_svd$u[,1], 
-           u2 = footy_svd$d[2]*footy_svd$u[,2],
-           league=rownames(footy_census)) |>
-  ggplot(aes(x=u1,y=u2))+
-  geom_point()+
-  ggrepel::geom_text_repel(aes(label=league))+
-  theme_minimal()+
-  theme(axis.title = element_text(size=16))+
-  labs(x="First singular vector, multipled by singular value",
-       y="Second singular vector, multipled by singular value")
+data.frame(
+    u1 = footy_svd$d[1] * footy_svd$u[, 1],
+    u2 = footy_svd$d[2] * footy_svd$u[, 2],
+    league = rownames(footy_census)
+) |>
+    ggplot(aes(x = u1, y = u2)) +
+    geom_point() +
+    ggrepel::geom_text_repel(aes(label = league)) +
+    theme_minimal() +
+    theme(axis.title = element_text(size = 16)) +
+    labs(
+        x = "First singular vector, multipled by singular value",
+        y = "Second singular vector, multipled by singular value"
+    )
 
 ```
 
@@ -350,13 +362,15 @@ How to interpret the dimensions? To investigate this question, we take a closer 
 general, any node/dyad/triad level statistic could be used.
 
 ```{r svd1_density,echo = FALSE,fig.width=12,fig.height=6}
-data.frame(y = footy_svd$d[1]*footy_svd$u[,1],
-           x = sapply(football_triad,graph.density)) |>
-  ggplot(aes(x,y))+
-  geom_point()+
-  theme_minimal()+
-  theme(axis.title = element_text(size=16))+
-  labs(x="density",y="First singular vector, multipled by singular value")
+data.frame(
+    y = footy_svd$d[1] * footy_svd$u[, 1],
+    x = sapply(football_triad, graph.density)
+) |>
+    ggplot(aes(x, y)) +
+    geom_point() +
+    theme_minimal() +
+    theme(axis.title = element_text(size = 16)) +
+    labs(x = "density", y = "First singular vector, multipled by singular value")
 
 ```
 
@@ -364,13 +378,15 @@ Density doesn't really seem to be related to the first dimension in this case (i
 explore this further
 
 ```{r svd2_030T,echo = FALSE,fig.width=12,fig.height=6}
-data.frame(y = footy_svd$d[2]*footy_svd$u[,2],
-           x = footy_census_norm[,9]) |>
-  ggplot(aes(x,y))+
-  geom_point()+
-  theme_minimal()+
-  theme(axis.title = element_text(size=16))+
-  labs(x="fraction of 030T",y="Second singular vector, multipled by singular value")
+data.frame(
+    y = footy_svd$d[2] * footy_svd$u[, 2],
+    x = footy_census_norm[, 9]
+) |>
+    ggplot(aes(x, y)) +
+    geom_point() +
+    theme_minimal() +
+    theme(axis.title = element_text(size = 16)) +
+    labs(x = "fraction of 030T", y = "Second singular vector, multipled by singular value")
 ```
 
 For the second dimension, we get a clearer association. It seems that the fraction of transitive triads 
@@ -413,12 +429,12 @@ data("dbces11")
 
 ```{r dbces11_basic_plot,echo=FALSE}
 xy <- graphlayouts::layout_with_stress(dbces11)
-ggraph(dbces11,"manual",x=xy[,1],y=xy[,2])+
-  geom_edge_link0()+
-  geom_node_point(shape=21,size=10,fill="grey66")+
-  geom_node_text(aes(label=name))+
-  theme_void()+
-  coord_equal(clip = "off")
+ggraph(dbces11, "manual", x = xy[, 1], y = xy[, 2]) +
+    geom_edge_link0() +
+    geom_node_point(shape = 21, size = 10, fill = "grey66") +
+    geom_node_text(aes(label = name)) +
+    theme_void() +
+    coord_equal(clip = "off")
 ```
 
 **degree** simply counts the number of neighbors a node has.
@@ -429,15 +445,15 @@ degree(dbces11)
 ```{r degree_dbces11_plot,echo=FALSE}
 id <- which.max(degree(dbces11))
 E(dbces11)$deg <- "no"
-E(dbces11)$deg[incident(dbces11,11)] <- "yes"
-ggraph(dbces11,"manual",x=xy[,1],y=xy[,2])+
-  geom_edge_link(aes(col=deg,width=deg),show.legend = FALSE)+
-  geom_node_point(shape=21,size=10,fill="grey66")+
-  geom_node_text(aes(label=name))+
-  scale_edge_color_manual(values=c("grey66","firebrick3"))+
-  scale_edge_width_manual(values=c(0.5,1.5))+
-  theme_void()+
-  coord_equal(clip = "off")
+E(dbces11)$deg[incident(dbces11, 11)] <- "yes"
+ggraph(dbces11, "manual", x = xy[, 1], y = xy[, 2]) +
+    geom_edge_link(aes(col = deg, width = deg), show.legend = FALSE) +
+    geom_node_point(shape = 21, size = 10, fill = "grey66") +
+    geom_node_text(aes(label = name)) +
+    scale_edge_color_manual(values = c("grey66", "firebrick3")) +
+    scale_edge_width_manual(values = c(0.5, 1.5)) +
+    theme_void() +
+    coord_equal(clip = "off")
 
 ```
 
@@ -463,15 +479,15 @@ Kn2 <- graph.full(5)
 V(Kn1)$name <- LETTERS[1:5]
 V(Kn2)$name <- LETTERS[7:11]
 
-B <- Kn1%u%Kn2
-B <- add.vertices(B,1,attr = list(name=LETTERS[6]))
-B <- add.edges(B,c(5,11,6,11))
+B <- Kn1 %u% Kn2
+B <- add.vertices(B, 1, attr = list(name = LETTERS[6]))
+B <- add.edges(B, c(5, 11, 6, 11))
 
-ggraph(B,"stress") + 
-  geom_edge_link0(edge_color="grey66")+
-  geom_node_point(shape=21,size=8,fill="grey25")+
-  geom_node_point(shape=21,size=8,aes(filter=name=="F"),fill="firebrick3")+
-  theme_void()
+ggraph(B, "stress") +
+    geom_edge_link0(edge_color = "grey66") +
+    geom_node_point(shape = 21, size = 8, fill = "grey25") +
+    geom_node_point(shape = 21, size = 8, aes(filter = name == "F"), fill = "firebrick3") +
+    theme_void()
 ```
 
 Any shortest path from the right will pass through the red node and vice versa. The 
@@ -502,12 +518,12 @@ V(dbces11)$cent[which.max(closeness(dbces11))] <- "CC"
 V(dbces11)$cent[which.max(eigen_centrality(dbces11)$vector)] <- "EC"
 V(dbces11)$cent[which.max(subgraph_centrality(dbces11))] <- "SC"
 
-ggraph(dbces11,"manual",x=xy[,1],y=xy[,2])+
-  geom_edge_link0()+
-  geom_node_point(shape=21,size=10,aes(fill=cent),show.legend = FALSE)+
-  geom_node_text(aes(filter=!is.na(cent),label=cent))+
-  theme_void()+
-  coord_equal(clip = "off")
+ggraph(dbces11, "manual", x = xy[, 1], y = xy[, 2]) +
+    geom_edge_link0() +
+    geom_node_point(shape = 21, size = 10, aes(fill = cent), show.legend = FALSE) +
+    geom_node_text(aes(filter = !is.na(cent), label = cent)) +
+    theme_void() +
+    coord_equal(clip = "off")
 
 ```
 
@@ -572,11 +588,11 @@ data("flo_marriage")
 ```
 
 ```{r flo_plot,echo=FALSE}
-ggraph(flo_marriage,"stress") +
-  geom_edge_link0(edge_color="grey66")+
-  geom_node_point(shape=21,aes(size=wealth),fill="grey66",show.legend=FALSE)+
-  geom_node_text(aes(size=wealth,label=name),show.legend = FALSE)+
-  theme_void()
+ggraph(flo_marriage, "stress") +
+    geom_edge_link0(edge_color = "grey66") +
+    geom_node_point(shape = 21, aes(size = wealth), fill = "grey66", show.legend = FALSE) +
+    geom_node_text(aes(size = wealth, label = name), show.legend = FALSE) +
+    theme_void()
 ```
 
 Th network shows marriage ties among Renaissance Families in Florence. Marriages at that time were
@@ -587,12 +603,13 @@ who became the most powerful family. This is in part due to their central positi
 The table bellow shows the ranking for the four most commonly used centrality indices (1=top rank).
 ```{r centralities_flo,echo=FALSE}
 data.frame(
-  name=V(flo_marriage)$name,
-  degree = rank(-degree(flo_marriage)),
-  betweenness = rank(-betweenness(flo_marriage)),
-  closeness = rank(-closeness(flo_marriage)),
-  eigen = rank(-eigen_centrality(flo_marriage)$vector)) |>
-  knitr::kable(row.names = FALSE)
+    name = V(flo_marriage)$name,
+    degree = rank(-degree(flo_marriage)),
+    betweenness = rank(-betweenness(flo_marriage)),
+    closeness = rank(-closeness(flo_marriage)),
+    eigen = rank(-eigen_centrality(flo_marriage)$vector)
+) |>
+    knitr::kable(row.names = FALSE)
 ```
 
 No matter what structural feature we consider to be important, the Medici always have the most advantageous position.
@@ -624,29 +641,31 @@ data("clique_graph")
 All maximal cliques can be calculated with `max_cliques()` (only feasible for fairly small networks). The min parameter can be used to set a minimum size. Here, we want to ignore all cliques of size $2$.
 ```{r calc_max_cliques}
 # only return cliques with three or more nodes
-cl <- max_cliques(clique_graph,min = 3)
+cl <- max_cliques(clique_graph, min = 3)
 cl
 ```
 
 The figure below shows the network and the found maximal cliques.
 
 ```{r plot_clique_graph,echo = FALSE}
-
 xy <- graphlayouts::layout_with_stress(clique_graph)
 
-cl_df <- as.data.frame(do.call("rbind",
-  lapply(seq_along(cl),function(x){
-    cbind(xy[cl[[x]],],x)
-  })
+cl_df <- as.data.frame(do.call(
+    "rbind",
+    lapply(seq_along(cl), function(x) {
+        cbind(xy[cl[[x]], ], x)
+    })
 ))
 
-ggraph(clique_graph,"stress") +
-  geom_edge_link0(edge_color="grey66")+
-  geom_node_point(shape=21,size=8,fill="grey25")+
-  ggforce::geom_mark_hull(data = cl_df,aes(V1,V2,fill=as.factor(x),group=x),show.legend = FALSE)+
-  scale_fill_manual(values=c("#E69F00", "#000000", "#56B4E9", "#009E73", "#F0E442", "#0072B2", 
-                             "#D55E00", "#CC79A7", "#666666"))+
-  theme_void()
+ggraph(clique_graph, "stress") +
+    geom_edge_link0(edge_color = "grey66") +
+    geom_node_point(shape = 21, size = 8, fill = "grey25") +
+    ggforce::geom_mark_hull(data = cl_df, aes(V1, V2, fill = as.factor(x), group = x), show.legend = FALSE) +
+    scale_fill_manual(values = c(
+        "#E69F00", "#000000", "#56B4E9", "#009E73", "#F0E442", "#0072B2",
+        "#D55E00", "#CC79A7", "#666666"
+    )) +
+    theme_void()
 
 ```
 
@@ -659,19 +678,19 @@ kcore
 
 
 ```{r kcore_plot, echo = FALSE}
-
-cl_df <- as.data.frame(do.call("rbind",
-  lapply(sort(unique(kcore))[c(2,3,4)],function(x){
-    cbind(xy[kcore>=x,],x)
+cl_df <- as.data.frame(do.call(
+    "rbind",
+    lapply(sort(unique(kcore))[c(2, 3, 4)], function(x) {
+        cbind(xy[kcore >= x, ], x)
     })
 ))
 
-ggraph(clique_graph,"stress") +
-  geom_edge_link0(edge_color="grey66")+
-  geom_node_point(shape = 21,size = 8,fill="grey25")+
-  ggforce::geom_mark_hull(data = cl_df,aes(V1,V2,fill=as.factor(x),group=x),show.legend = FALSE)+
-  scale_fill_manual(values=c("red","blue","green"))+
-  theme_void()
+ggraph(clique_graph, "stress") +
+    geom_edge_link0(edge_color = "grey66") +
+    geom_node_point(shape = 21, size = 8, fill = "grey25") +
+    ggforce::geom_mark_hull(data = cl_df, aes(V1, V2, fill = as.factor(x), group = x), show.legend = FALSE) +
+    scale_fill_manual(values = c("red", "blue", "green")) +
+    theme_void()
 
 ```
 
@@ -683,13 +702,13 @@ A cluster is loosely defined as a group of nodes which are internally densely an
 n1 <- 5
 n2 <- 20
 set.seed(1234)
-g <- sample_islands(n1,n2,0.9,5)
+g <- sample_islands(n1, n2, 0.9, 5)
 g <- simplify(g)
-V(g)$grp <- rep(LETTERS[1:n1],each=n2)
-ggraph(g,"stress")+
-  geom_edge_link0(edge_width=0.2,edge_color="grey66")+
-  geom_node_point(shape=21,size=5,aes(fill=grp),show.legend = FALSE)+
-  theme_void()
+V(g)$grp <- rep(LETTERS[1:n1], each = n2)
+ggraph(g, "stress") +
+    geom_edge_link0(edge_width = 0.2, edge_color = "grey66") +
+    geom_node_point(shape = 21, size = 5, aes(fill = grp), show.legend = FALSE) +
+    theme_void()
 ```
 
 In contrast, the network below does not really seem to have any well defined cluster structure.
@@ -699,13 +718,13 @@ n1 <- 5
 n2 <- 20
 
 set.seed(1234)
-g <- sample_islands(n1,n2,0.25,15)
+g <- sample_islands(n1, n2, 0.25, 15)
 g <- simplify(g)
-V(g)$grp <- rep(LETTERS[1:n1],each=n2)
-ggraph(g,"stress")+
-  geom_edge_link0(edge_width=0.2,edge_color="grey66")+
-  geom_node_point(shape=21,size=5,fill="grey66",show.legend = FALSE)+
-  theme_void()
+V(g)$grp <- rep(LETTERS[1:n1], each = n2)
+ggraph(g, "stress") +
+    geom_edge_link0(edge_width = 0.2, edge_color = "grey66") +
+    geom_node_point(shape = 21, size = 5, fill = "grey66", show.legend = FALSE) +
+    theme_void()
 
 ```
 
@@ -713,7 +732,7 @@ The following algorithms for graph clustering are implemented in `igraph`.
 
 ```{r cluster_alg, echo=FALSE}
 algs <- as.character(lsf.str("package:igraph"))
-algs[stringr::str_detect(algs,"cluster_")]
+algs[stringr::str_detect(algs, "cluster_")]
 ```
 
 Most of these algorithms are based on "modularity maximization". Modularity is defined as the fraction of edges that fall within given groups minus the expected fraction if edges were distributed at random.
@@ -725,11 +744,11 @@ data("karate")
 ```
 
 ```{r karate_plot,echo=FALSE}
-ggraph(karate,"stress")+
-  geom_edge_link0(edge_color="grey66")+
-  geom_node_point(shape=21,size=5,fill="grey66")+
-  theme_void()+
-  coord_equal()
+ggraph(karate, "stress") +
+    geom_edge_link0(edge_color = "grey66") +
+    geom_node_point(shape = 21, size = 5, fill = "grey66") +
+    theme_void() +
+    coord_equal()
 ```
 
 ```{r cluster_ex}
@@ -753,11 +772,13 @@ lec <- cluster_leading_eigen(karate)
 loc <- cluster_louvain(karate)
 sgc <- cluster_spinglass(karate)
 wtc <- cluster_walktrap(karate)
-scores <- c(infomap = modularity(karate,membership(imc)),
-            eigen = modularity(karate,membership(lec)),
-            louvain = modularity(karate,membership(loc)),
-            spinglass = modularity(karate,membership(sgc)),
-            walk = modularity(karate,membership(wtc)))
+scores <- c(
+    infomap = modularity(karate, membership(imc)),
+    eigen = modularity(karate, membership(lec)),
+    louvain = modularity(karate, membership(loc)),
+    spinglass = modularity(karate, membership(sgc)),
+    walk = modularity(karate, membership(wtc))
+)
 scores
 ```
 
@@ -766,11 +787,11 @@ The corresponding clustering is shown below.
 
 ```{r karate_plot_clu,echo=FALSE}
 V(karate)$clu <- membership(sgc)
-ggraph(karate,"stress")+
-  geom_edge_link0(edge_color="grey66")+
-  geom_node_point(shape=21,size=5,aes(fill=as.factor(clu)),show.legend=FALSE)+
-  theme_void()+
-  coord_equal()
+ggraph(karate, "stress") +
+    geom_edge_link0(edge_color = "grey66") +
+    geom_node_point(shape = 21, size = 5, aes(fill = as.factor(clu)), show.legend = FALSE) +
+    theme_void() +
+    coord_equal()
 ```
 
 Modularity maximization is still widely considered as the state-of-the-art clustering method
@@ -782,25 +803,25 @@ consists of cliques connected in a ring.
 ```{r prepare_Kn_graph,echo=FALSE}
 n1 <- 5
 n2 <- 50
-A <- matrix(1,n1,n1)
-lst <- vector("list",n2)
-lst <- lapply(lst,function(x) A)
+A <- matrix(1, n1, n1)
+lst <- vector("list", n2)
+lst <- lapply(lst, function(x) A)
 AA <- Matrix::bdiag(lst)
-for(i in 1:(n2-1)){
-  AA[i*n1,i*n1+1] <- AA[i*n1+1,i*n1] <- 1
+for (i in 1:(n2 - 1)) {
+    AA[i * n1, i * n1 + 1] <- AA[i * n1 + 1, i * n1] <- 1
 }
-AA[1,n1*n2] <- AA[n1*n2,1] <- 1
-K50 <- graph_from_adjacency_matrix(AA,"undirected",diag=FALSE)
+AA[1, n1 * n2] <- AA[n1 * n2, 1] <- 1
+K50 <- graph_from_adjacency_matrix(AA, "undirected", diag = FALSE)
 ```
 
 The figure below shows such a graph, consisting of 50 cliques of size 5. 
 
 ```{r plot_K50_blank,echo=FALSE,fig.width=8,fig.height=8}
-ggraph(K50,"stress")+
-  geom_edge_link0(edge_width=0.6,edge_color="grey66")+
-  geom_node_point(shape=21,fill="grey66",size=2,show.legend = FALSE)+
-  theme_void()+
-  coord_fixed()
+ggraph(K50, "stress") +
+    geom_edge_link0(edge_width = 0.6, edge_color = "grey66") +
+    geom_node_point(shape = 21, fill = "grey66", size = 2, show.legend = FALSE) +
+    theme_void() +
+    coord_fixed()
 ```
 
 Intuitively, any clustering method should return a cluster for each clique.
@@ -814,7 +835,7 @@ table(membership(clu_louvain))
 A clustering algorithm that fixes this issue is the leiden algorithm.
 
 ```{r clu_leiden_K50}
-clu_leiden <- cluster_leiden(K50,objective_function = "CPM",resolution_parameter = 0.5)
+clu_leiden <- cluster_leiden(K50, objective_function = "CPM", resolution_parameter = 0.5)
 table(membership(clu_leiden))
 
 ```
@@ -824,13 +845,13 @@ The figure below shows the clusters computed with the louvain method in grey and
 ```{r plot_K50_clu, echo=FALSE,fig.width=8,fig.height=8}
 V(K50)$louvain <- membership(clu_louvain)
 V(K50)$leiden <- membership(clu_leiden)
-ggraph(K50,"stress")+
-  geom_edge_link0(edge_width=0.6,edge_color="grey66")+
-  geom_node_point(shape=21,fill="grey66",size=1.5,show.legend = FALSE)+
-  ggforce::geom_mark_ellipse(aes(x,y,group=louvain),expand = unit(4.5,"pt"),fill="black",alpha=0.25)+
-  ggforce::geom_mark_circle(aes(x,y,group=leiden),expand = unit(4.5,"pt"),col="firebrick3",size=1)+
-  theme_void()+
-  coord_fixed()
+ggraph(K50, "stress") +
+    geom_edge_link0(edge_width = 0.6, edge_color = "grey66") +
+    geom_node_point(shape = 21, fill = "grey66", size = 1.5, show.legend = FALSE) +
+    ggforce::geom_mark_ellipse(aes(x, y, group = louvain), expand = unit(4.5, "pt"), fill = "black", alpha = 0.25) +
+    ggforce::geom_mark_circle(aes(x, y, group = leiden), expand = unit(4.5, "pt"), col = "firebrick3", size = 1) +
+    theme_void() +
+    coord_fixed()
 
 ```
 
@@ -875,12 +896,12 @@ data("southern_women")
 ```
 
 ```{r southern_women,echo=FALSE}
-ggraph(southern_women,"stress")+
-  geom_edge_link(edge_color="grey66")+
-  geom_node_point(aes(fill=type,shape=type),size=8,show.legend = FALSE)+
-  geom_node_text(aes(label=name))+
-  scale_shape_manual(values=c(21,22))+
-  theme_void()
+ggraph(southern_women, "stress") +
+    geom_edge_link(edge_color = "grey66") +
+    geom_node_point(aes(fill = type, shape = type), size = 8, show.legend = FALSE) +
+    geom_node_text(aes(label = name)) +
+    scale_shape_manual(values = c(21, 22)) +
+    theme_void()
 
 ```
 
@@ -899,7 +920,7 @@ Besides analyzing a two-mode network as-is, there is also the possibility to pro
 Mathematically, this is done by calculating $AA^T$ or $A^TA$, depending which mode we project on.
 As an example, consider the southern women dataset again.
 ```{r proj_women}
-B <- A%*%t(A)
+B <- A %*% t(A)
 B
 ```
 
@@ -907,15 +928,15 @@ This matrix can now be interpreted as a weighted network among the 18 women. Eac
 two women went to the same event.
 
 ```{r plot_weighted_proj,echo = FALSE}
-proj <- graph_from_adjacency_matrix(B,weighted = TRUE,diag = FALSE,mode = "undirected")
+proj <- graph_from_adjacency_matrix(B, weighted = TRUE, diag = FALSE, mode = "undirected")
 
-ggraph(proj,"stress")+
-  geom_edge_link(aes(edge_width=weight),edge_color="grey66",show.legend = FALSE)+
-  geom_node_point(shape=21,fill="grey66",size=8,show.legend = FALSE)+
-  geom_node_text(aes(label=name))+
-  scale_edge_width(range = c(1,4))+
-  theme_void()+
-  coord_cartesian(clip = "off")
+ggraph(proj, "stress") +
+    geom_edge_link(aes(edge_width = weight), edge_color = "grey66", show.legend = FALSE) +
+    geom_node_point(shape = 21, fill = "grey66", size = 8, show.legend = FALSE) +
+    geom_node_text(aes(label = name)) +
+    scale_edge_width(range = c(1, 4)) +
+    theme_void() +
+    coord_cartesian(clip = "off")
 
 ```
 
@@ -954,7 +975,7 @@ The foundation of `signnet` is provided by `igraph`. All functions in the packag
 assume that an igraph object is a signed network if it has an edge attribute “sign” with values 1 (positive) or -1 (negative).
 ```{r signed_example}
 library(signnet)
-g <- graph.full(5,directed = FALSE,loops = FALSE)
+g <- graph.full(5, directed = FALSE, loops = FALSE)
 E(g)$sign <- 1
 g
 ```
@@ -965,12 +986,12 @@ Matrices associated with a signed network follow the `igraph` naming scheme. The
 
 ```{r signed_adj}
 data("tribes")
-as_adj_signed(tribes)[1:5,1:5]
+as_adj_signed(tribes)[1:5, 1:5]
 ```
 
 The signed Laplacian matrix is obtained by `laplacian_matrix_signed()`.
 ```{r signed_lapl}
-laplacian_matrix_signed(tribes)[1:5,1:5]
+laplacian_matrix_signed(tribes)[1:5, 1:5]
 ```
 
 A function not explicitly mentioned in the tutorials linked above is `triad_census_signed()` which calculates the
@@ -1006,7 +1027,7 @@ you with everything you need.
 
 <summary>Expand</summary>
 
-For analyzing multilevel networks, I recommend the `multinet` pakage ([link](https://CRAN.R-project.org/package=multinets)).
+For analyzing multilevel networks, I recommend the `multinet` pakage ([link](https://CRAN.R-project.org/package=multinet)).
 Check out this [JSS Paper](http://multilayer.it.uu.se/jss.pdf) for a brief introduction into the package.
 
 If you just want to visualize a multilevel network, then head over to my [network visualization](../netvizr/#multilevel-networks) tutorial.
@@ -1059,8 +1080,10 @@ Cant find what you are looking for? Ping me on [twitter](https://twitter.com/sch
 
 
 ```{r read_graph,eval=FALSE}
-read_graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
-  "graphml", "dimacs", "graphdb", "gml", "dl"), ...)
+read_graph(file, format = c(
+    "edgelist", "pajek", "ncol", "lgl",
+    "graphml", "dimacs", "graphdb", "gml", "dl"
+), ...)
 ```
 
 (*I personally have encountered some issue when importing `graphml` files that were 
