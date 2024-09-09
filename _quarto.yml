@@ -1,0 +1,16 @@
+---
+title: "Basic Network Analysis in R"
+subtitle: "using igraph and related packages"
+author: 
+  - name: David Schoch
+    orcid: 0000-0003-1689-0557
+    email: david.schoch@gesis.org
+    url: https://mr.schochastics.net
+    affiliations:
+      - name: GESIS - Leibniz Institute for the Social Sciences
+description: Tutorial for Network Analysis in R
+toc: true
+execute:
+  freeze: true
+  echo: true
+  warning: false
